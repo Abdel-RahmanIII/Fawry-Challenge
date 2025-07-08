@@ -1,15 +1,17 @@
 package ecommerceSystem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Customer {
 	double balance;
-	private List<CartItem> cart;
+	private HashMap<String, CartItem> cart;
 
 	public Customer(double balance) {
 		this.balance = balance;
-		this.cart = new ArrayList<CartItem>();
+		this.cart = new HashMap<String, CartItem>();
 	}
 	
 	public void addToCart(Product p, int quantity) {
@@ -19,7 +21,14 @@ public class Customer {
 		if (quantity > p.getQuantity()) {
 			throw new IllegalStateException("Insufficient stock of: " + p.getName());
 		}
-		cart.add(new CartItem(p,quantity));
+		
+		String name = p.getName();
+		if (cart.containsKey(name)) {
+			CartItem item = cart.get(name);
+			item.addQuantity(quantity);
+			cart.put(name, item);
+		}else
+			cart.put(name, new CartItem(p,quantity));
 	}
 
 	public void setBalance(double balance) {		//Could replace by deposit/withdraw to ensure correct calculations
@@ -34,6 +43,11 @@ public class Customer {
 	}
 	
 	public List<CartItem> getCart() {
-		return cart;
+		List<CartItem> output = new ArrayList<CartItem>();
+		
+		for(CartItem item : cart.values()) {
+			output.add(item);
+		}
+		return output;
 	}
 }
